@@ -20,7 +20,7 @@ file_name="sample"
 
 search_word=(s["search"])
 
-
+# commit用　メモ書き
 print("Content-Type: text/html; charset=utf-8\n")
 print("\n")
 print("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n")
