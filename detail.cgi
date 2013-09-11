@@ -49,7 +49,18 @@ printf("<p><b>Title:</b>%s</p>\n",CGI.escapeHTML(row[1]))
 count=1
 end
 
-printf("<p><b>%s:</b>%s</p>\n",CGI.escapeHTML(row[2].to_s),CGI.escapeHTML(row[3].to_s))
+case row[2]
+when "online_issn" then
+printf("<p><b>%s:</b>"'<a href='"http://komorido.nims.go.jp/erms/journals?query=%s"'>%s</a>'"</p>",CGI.escapeHTML(row[2].to_s),CGI.escapeHTML(row[3].to_s),CGI.escapeHTML(row[3].to_s))
+when "print_issn" then
+printf("<p><b>%s:</b>"'<a href='"https://library.nims.go.jp/manifestations?query=%s"'>%s</a>'"</p>",CGI.escapeHTML(row[2].to_s),CGI.escapeHTML(row[3].to_s),CGI.escapeHTML(row[3].to_s))
+when "doi" then
+printf("<p><b>%s:</b>"'<a href='"http://dx.doi.org/%s"'>%s</a>'"</p>",CGI.escapeHTML(row[2].to_s),CGI.escapeHTML(row[3].to_s),CGI.escapeHTML(row[3].to_s))
+else
+printf("<p><b>%s:</b></p>",CGI.escapeHTML(row[2].to_s),CGI.escapeHTML(row[3].to_s))
+end
+
+#printf("<p><b>%s:</b>%s</p>\n",CGI.escapeHTML(row[2].to_s),CGI.escapeHTML(row[3].to_s))
 
 }
 #}
