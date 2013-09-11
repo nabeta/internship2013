@@ -102,7 +102,7 @@ end
 db.close
 else
 
-db.execute("select distinct resource.id from resource left join identifier on resource.id=identifier.resource_id where identifier.body=? or identifier.id_type=? or resource.id=? or resource.title=? ;",search_word,search_word,search_word,search_word){|temp_id|
+db.execute("SELECT DISTINCT resource.id FROM resource LEFT JOIN identifier ON resource.id=identifier.resource_id WHERE identifier.body=? OR identifier.id_type=? OR resource.id=? OR resource.title=? ;",search_word,search_word,search_word,search_word){|temp_id|
  s_id[n]=temp_id[0]
  n+=1
 print("\n")
