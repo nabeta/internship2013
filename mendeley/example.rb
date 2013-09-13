@@ -1,9 +1,12 @@
 require 'oauth'
 require 'oauth/consumer'
+require 'yaml'
+
+config = YAML.load(open('config.yml'))
 
 consumer = OAuth::Consumer.new(
-  "your consumer key",
-  "your consumer secret key",
+  config['consumer_key'],
+  config['consumer_secret'],
   {
     :site=>"http://api.mendeley.com/",
     :proxy => "http://wwwout.nims.go.jp:8888",
@@ -15,8 +18,8 @@ consumer = OAuth::Consumer.new(
 
 access_token = OAuth::AccessToken.new(
   consumer,
-  "your access token",
-  "your access secret key",
+  config['access_key'],
+  config['access_secret'],
 )
 
 p access_token.get('http://api.mendeley.com/oapi/library/').body
