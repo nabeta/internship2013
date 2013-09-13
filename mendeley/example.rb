@@ -45,26 +45,26 @@ access_token = OAuth::AccessToken.new(
 
 
 #==== Profile Infomation ====
-printf "\nユーザー情報\n"
-temp_profile = access_token.get('http://api.mendeley.com/oapi/profiles/info/me/').body
-profile = JSON.parse(temp_profile)
-profile["main"].each{|profile_key,profile_val|
-  print "#{profile_key}"+':'+"#{profile_val}"
-}
+#printf "\nユーザー情報\n"
+#temp_profile = access_token.get('http://api.mendeley.com/oapi/profiles/info/me/').body
+#profile = JSON.parse(temp_profile)
+#profile["main"].each{|profile_key,profile_val|
+#  print "#{profile_key}"+':'+"#{profile_val}"
+#}
 #===========================
 
 
 
 
 #==== User Library Groups ====
-printf "\nグループ情報\n"
+#printf "\nグループ情報\n"
 groups_id=nil
 
 temp_groups =access_token.get('http://api.mendeley.com/oapi/library/groups/').body
 groups=JSON.parse(temp_groups)
 groups.each{|groups_hash|
   groups_hash.each{|groups_key,groups_val|
-    puts "#{groups_key}:#{groups_val}"
+#    puts "#{groups_key}:#{groups_val}"
     if groups_key=="id" then
       groups_id =groups_val
     end
@@ -99,16 +99,12 @@ group_documents.each{|group_documents_key,group_documents_val|
 printf "\nグループドキュメント詳細情報\n"
 document_detail=nil
 document_title_count_num=0
+group_documents_ids_count_num=0
 
 count_num=0
 file_hash=[]
 count_hash_num=0
 document_title=[]
-
-family_name=nil
-given_name=nil
-issued_year=[]
-authors_name=nil
 
 
 issued_count_num=0
@@ -116,17 +112,29 @@ name_count_num=0
 authors_count_num=0
 
 group_documents_ids.each{|ids|
- document_detail = JSON.parse(access_token.get('http://api.mendeley.com/oapi/library/documents/'+"#{ids}"+'/').body)
-  #puts document_detail
-  document_detail.each{|document_detail_key,document_detail_val|
-    #  if key == "authors" then
-    #    authors_name[][authors_count_num] =val
-    #    authors_count_num+=1
-    #  end
-    
- #    authors_name.each{|name|
 
-#      name.each{|type,body|
+  document_detail = JSON.parse(access_token.get('http://api.mendeley.com/oapi/library/documents/'+"#{ids}"+'/').body)
+  document_detail["authors"].each{|num|
+    printf("%s %s\n",num["forename"],num["surname"])
+  }
+
+
+#  document_detail = JSON.parse(access_token.get('http://api.mendeley.com/oapi/library/documents/'+"#{ids}"+'/').body)
+#  document_detail.each{|document_detail_key,document_detail_val|
+#      if document_detail_key == "authors" then
+#        authors_name[group_documents_ids_count_num[authors_count_num]] =document_detail_val
+#        authors_count_num+=1
+#      end
+
+
+
+
+
+# for i in 0..authors_count_num do
+#   authors_name[group_documents_ids_count_num[i]]
+
+#    authors_name[group_documents_ids_count_num].each{|name|
+#      name.each{|name_type,name_body|
 #        if type == "forname" then
 #          family_name[name_count_num] = body
 #          puts family_name[name_count_num]
@@ -138,45 +146,57 @@ group_documents_ids.each{|ids|
 #          name_count_num +=1
 #        end
 #      }
-#    }
+#      }    
+#   end
+
+
+
+
+
+
+
+
+
 
 #  if key == "year" then
 #    issued_year[issued_count_num] =val
 #    issued_count_num +=1
 #  end
-    if document_detail_key == "title" then
-      document_title[document_title_count_num] = document_detail_val
-      document_title_count_num += 1
-      printf "#{document_title_count_num}件目\n"
-      puts "#{document_detail_key}:#{document_detail_val}"
-    end
-  }
+#    if document_detail_key == "title" then
+#      document_title[document_title_count_num] = document_detail_val
+#      document_title_count_num += 1
+#      printf "#{document_title_count_num}件目\n"
+#      puts "#{document_detail_key}:#{document_detail_val}"
+#    end
+#  }
 
 
-
-document_detail.each{|key,val|
-
-  if key != "title" then  
-    puts "#{key}:#{val}"
-  end
-
-  if key == "files" then
-  
-    val.each{|hash|
-      hash.each{|files_key,files_val|
-        if files_key == "file_hash" then
-          file_hash[count_hash_num] = files_val
-          count_hash_num+=1
-        end
-      }
-
-    }
-  end
-  }
+#document_detail.each{|key,val|
+#  if key != "title" then  
+#    puts "#{key}:#{val}"
+#  end
+#  if key == "files" then
+#    val.each{|hash|
+#      hash.each{|files_key,files_val|
+#        if files_key == "file_hash" then
+#          file_hash[count_hash_num] = files_val
+#          count_hash_num+=1
+#       end
+#      }
+#
+#    }
+#  end
+#  }
+#group_documents_ids_count_num+=1
 }
+#puts authors_name[0][1]
 printf "\n\n"
 
-
+printf "==================================================\n\n"
+document_detail.each{|key,val|
+  puts "#{key}:#{val}"
+}
+printf "==================================================\n\n"
 
 #========================================
 
@@ -184,11 +204,9 @@ printf "\n\n"
 
 
 #====== ドキュメントDL ============
-count_hash_num=0
-printf "ドキュメントDL\n"
-#p file_hash[0]
-group_documents_ids.each{|id|
-p count_hash_num
+#count_hash_num=0
+#printf "ドキュメントDL\n"
+#group_documents_ids.each{|id|
 #body = access_token.get('http://api.mendeley.com/oapi/library/documents/'+id+'/file/'+"#{file_hash[count_hash_num]}"+'/'+"#{groups_id}"+'/').body
 #この時点ではバイナリデータでDLしている
 
@@ -196,10 +214,10 @@ p count_hash_num
 #file.write body
 
 #              }
-count_hash_num+=1
-}
+#count_hash_num+=1
+#}
 
-printf "書き込み終了\n"
+#printf "書き込み終了\n"
 
 #============
 
@@ -236,11 +254,8 @@ printf "書き込み終了\n"
 #タイトル、著者(苗字、名前、フルネーム)、出版年
 
 
-printf "書誌データ作成\n"
+#printf "書誌データ作成\n"
 #document_title
-puts family_name
-puts given_name
-puts issued_year
 
 
 #bibliographic_data=nil
