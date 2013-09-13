@@ -33,94 +33,125 @@ access_token = OAuth::AccessToken.new(
 #====== ここらへんまでログイン作業 =======
 
 
+
+
 # ====== ライブラリドキュメントのタイトルを取得 ==========
-#p access_token.get('http://api.mendeley.com/oapi/library/').body
-
-# a=  access_token.get('http://api.mendeley.com/oapi/library/documents/6087871964').body
-
+# a=  access_token.get('http://api.mendeley.com/oapi/library/documents/6083469224').body
 #result = JSON.parse(a)
 #p  result["title"]
-
 # ===========================
 
 
+
+
 #==== Profile Infomation ====
-
-temp = access_token.get('http://api.mendeley.com/oapi/profiles/info/me/').body
-profile = JSON.parse(temp)
-#p profile
-
 printf "\nユーザー情報\n"
-profile["main"].each{|key,val|
-  puts "#{key}:#{val}"
+temp_profile = access_token.get('http://api.mendeley.com/oapi/profiles/info/me/').body
+profile = JSON.parse(temp_profile)
+profile["main"].each{|profile_key,profile_val|
+  print "#{profile_key}"+':'+"#{profile_val}"
 }
 #===========================
 
+
+
+
 #==== User Library Groups ====
+printf "\nグループ情報\n"
+groups_id=nil
 
 temp_groups =access_token.get('http://api.mendeley.com/oapi/library/groups/').body
-
-#p JSON.parse(temp_groups)
 groups=JSON.parse(temp_groups)
-
-printf "\nグループ情報\n"
-
-groups_id=nil
-groups.each{|hash|
-#   puts "#{hash}"
-  hash.each{|key,val|
-    puts "#{key}:#{val}"
-if key=="id" then
-groups_id =val
-end
+groups.each{|groups_hash|
+  groups_hash.each{|groups_key,groups_val|
+    puts "#{groups_key}:#{groups_val}"
+    if groups_key=="id" then
+      groups_id =groups_val
+    end
   }
 }
 #=============================
 
+
+
+
 #===== Group Documents ======
-#p groups_id
-group_documents_ids = nil
-t_group_documents =  access_token.get('http://api.mendeley.com/oapi/library/groups/'+"#{groups_id}"+'/').body
-group_documents = JSON.parse(t_group_documents)
-
-
 printf "\nグループライブラリー情報\n"
-group_documents.each{|key,val|
-puts "#{key}:#{val}"
-if key=="document_ids" then
-#puts val[0]
-  val.each{|ids|
-    group_documents_ids=val
-  }
-end
+group_documents_ids = nil
+
+temp_group_documents =  access_token.get('http://api.mendeley.com/oapi/library/groups/'+"#{groups_id}"+'/').body
+group_documents = JSON.parse(temp_group_documents)
+
+group_documents.each{|group_documents_key,group_documents_val|
+  puts "#{group_documents_key}:#{group_documents_val}"
+  if group_documents_key=="document_ids" then
+    group_documents_val.each{|ids|
+      group_documents_ids=group_documents_val
+    }
+  end
 }
-
-#print "test"
-#p group_documents_ids
-
 #===========================
 
+
+
+
 #====== 各グループドキュメント詳細情報 =====
-
 printf "\nグループドキュメント詳細情報\n"
-
 document_detail=nil
+document_title_count_num=0
+
 count_num=0
 file_hash=[]
 count_hash_num=0
 document_title=[]
 
+family_name=nil
+given_name=nil
+issued_year=[]
+authors_name=nil
+
+
+issued_count_num=0
+name_count_num=0
+authors_count_num=0
+
 group_documents_ids.each{|ids|
  document_detail = JSON.parse(access_token.get('http://api.mendeley.com/oapi/library/documents/'+"#{ids}"+'/').body)
+  #puts document_detail
+  document_detail.each{|document_detail_key,document_detail_val|
+    #  if key == "authors" then
+    #    authors_name[][authors_count_num] =val
+    #    authors_count_num+=1
+    #  end
+    
+ #    authors_name.each{|name|
 
-document_detail.each{|key,val|
-  if key == "title" then
-    document_title[count_num] = val
-    count_num += 1
-    printf "#{count_num}件目\n"
-    puts "#{key}:#{val}"
-  end
-}
+#      name.each{|type,body|
+#        if type == "forname" then
+#          family_name[name_count_num] = body
+#          puts family_name[name_count_num]
+#        elsif type == "sunname" then
+#          given_name[name_count_num] = body
+#          puts gimen_name[name_count_num]
+#       end
+#        if type == "forname" or type == "sunname" then
+#          name_count_num +=1
+#        end
+#      }
+#    }
+
+#  if key == "year" then
+#    issued_year[issued_count_num] =val
+#    issued_count_num +=1
+#  end
+    if document_detail_key == "title" then
+      document_title[document_title_count_num] = document_detail_val
+      document_title_count_num += 1
+      printf "#{document_title_count_num}件目\n"
+      puts "#{document_detail_key}:#{document_detail_val}"
+    end
+  }
+
 
 
 document_detail.each{|key,val|
@@ -143,12 +174,14 @@ document_detail.each{|key,val|
   end
   }
 }
-
 printf "\n\n"
 
 
 
 #========================================
+
+
+
 
 #====== ドキュメントDL ============
 count_hash_num=0
@@ -174,31 +207,48 @@ printf "書き込み終了\n"
 
 
 #===== POSTメゾット ========
-Net::HTTP.version_1_2
-count_title_num=0
+#Net::HTTP.version_1_2
+#count_title_num=0
 
 #basic認証用
-access_id="test"
-access_pass=1111
+#access_id="test"
+#access_pass=1111
 
-printf "#{access_id}"+':'+"#{access_pass}"+'@'+'komorido.nims.go.jp'+"\n\n"
-
-
-group_documents_ids.each{|id|
-req=Net::HTTP::Post.new('/~a012427/create.cgi')
-    req.basic_auth "#{access_id}", "#{access_pass}"
-Net::HTTP.start( 'komorido.nims.go.jp' ) {|http|
- req.set_form_data({"title" => "#{document_title[count_title_num]}" , "print_issn" =>"", "online_issn" =>"" , "print_isbn" =>"" , "online_isbn" =>"", "doi" =>"" })
- response=http.request(req)
+#printf "#{access_id}"+':'+"#{access_pass}"+'@'+'komorido.nims.go.jp'+"\n\n"
 
 
 #group_documents_ids.each{|id|
-#Net::HTTP.start("#{access_id}"+':'+"#{access_pass}"+'@'+'komorido.nims.go.jp',80){|http|
-#response=http.post('/~a012427/create.cgi','title='+"#{document_title[count_title_num]}"+'&print_issn=&online_issn=&print_isbn=&online_isbn=&doi=')
-count_title_num+=1
-puts response.body
-                          }
-                        }
+#req=Net::HTTP::Post.new('/~a012427/create.cgi')
+#    req.basic_auth "#{access_id}", "#{access_pass}"
+#Net::HTTP.start( 'komorido.nims.go.jp' ) {|http|
+# req.set_form_data({"title" => "#{document_title[count_title_num]}" , "print_issn" =>"", "online_issn" =>"" , "print_isbn" =>"" , "online_isbn" =>"", "doi" =>"" })
+# response=http.request(req)
+#count_title_num+=1
+#puts response.body
+#                          }
+#                        }
+
 #=================================
 
 
+#===== 書誌データ作成(xml) ======
+#使えそうなデータ
+#タイトル、著者(苗字、名前、フルネーム)、出版年
+
+
+printf "書誌データ作成\n"
+#document_title
+puts family_name
+puts given_name
+puts issued_year
+
+
+#bibliographic_data=nil
+#
+#open(id+".xml","w"){|file|
+#file.write bibliographic data
+#              }
+#}
+#=================
+
+printf "おわり\n"
