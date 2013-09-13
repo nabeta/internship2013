@@ -4,24 +4,16 @@
 require 'json'
 require 'oauth'
 require 'oauth/consumer'
-<<<<<<< HEAD
 require 'tempfile'
 require 'net/http'
-
-#====== ここでログイン作業中 ======
-
-consumer = OAuth::Consumer.new(
-  #"your consumer key",
-#"your consumer secret key",
-=======
 require 'yaml'
+#====== ここでログイン作業中 ======
 
 config = YAML.load(open('config.yml'))
 
 consumer = OAuth::Consumer.new(
   config['consumer_key'],
   config['consumer_secret'],
->>>>>>> 5ced2f36fd72515184ada7bc605c367d82dd3db2
   {
     :site=>"http://api.mendeley.com/",
     :proxy => "http://wwwout.nims.go.jp:8888",
@@ -33,14 +25,8 @@ consumer = OAuth::Consumer.new(
 
 access_token = OAuth::AccessToken.new(
   consumer,
-<<<<<<< HEAD
-  #"your access token",
-  #"your access secret key",
-
-=======
   config['access_key'],
   config['access_secret'],
->>>>>>> 5ced2f36fd72515184ada7bc605c367d82dd3db2
 )
 
 
