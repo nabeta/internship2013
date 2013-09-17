@@ -346,8 +346,8 @@ end
 printf "Pubman新規作成\n"
 
 #basic認証用
-access_id="pubman_depositor"
-access_pass="admin"
+access_id=""
+access_pass=""
 
 Net::HTTP.version_1_2
 
