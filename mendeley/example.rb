@@ -7,6 +7,7 @@ require 'oauth/consumer'
 require 'tempfile'
 require 'net/http'
 require 'yaml'
+require 'zip'
 #====== ここでログイン作業中 ======
 
 config = YAML.load(open('config.yml'))
@@ -46,11 +47,11 @@ access_token = OAuth::AccessToken.new(
 
 #==== Profile Infomation ====
 #printf "\nユーザー情報\n"
-#temp_profile = access_token.get('http://api.mendeley.com/oapi/profiles/info/me/').body
-#profile = JSON.parse(temp_profile)
-#profile["main"].each{|profile_key,profile_val|
+temp_profile = access_token.get('http://api.mendeley.com/oapi/profiles/info/me/').body
+profile = JSON.parse(temp_profile)
+profile["main"].each{|profile_key,profile_val|
 #  print "#{profile_key}"+':'+"#{profile_val}"
-#}
+}
 #===========================
 
 
@@ -76,14 +77,14 @@ groups.each{|groups_hash|
 
 
 #===== Group Documents ======
-printf "\nグループライブラリー情報\n"
+#printf "\nグループライブラリー情報\n"
 group_documents_ids = nil
 
 temp_group_documents =  access_token.get('http://api.mendeley.com/oapi/library/groups/'+"#{groups_id}"+'/').body
 group_documents = JSON.parse(temp_group_documents)
 
 group_documents.each{|group_documents_key,group_documents_val|
-  puts "#{group_documents_key}:#{group_documents_val}"
+#  puts "#{group_documents_key}:#{group_documents_val}"
   if group_documents_key=="document_ids" then
     group_documents_val.each{|ids|
       group_documents_ids=group_documents_val
@@ -96,10 +97,10 @@ group_documents.each{|group_documents_key,group_documents_val|
 
 
 #====== 各グループドキュメント詳細情報 =====
-printf "\nグループドキュメント詳細情報\n"
+#printf "\nグループドキュメント詳細情報\n"
 document_detail=nil
 document_title_count_num=0
-group_documents_ids_count_num=0
+#group_documents_ids_count_num=0
 
 count_num=0
 file_hash=[]
@@ -107,16 +108,18 @@ count_hash_num=0
 document_title=[]
 
 
-issued_count_num=0
-name_count_num=0
-authors_count_num=0
+#issued_count_num=0
+#name_count_num=0
+#authors_count_num=0
+
+
 
 group_documents_ids.each{|ids|
-
+#
   document_detail = JSON.parse(access_token.get('http://api.mendeley.com/oapi/library/documents/'+"#{ids}"+'/').body)
-  document_detail["authors"].each{|num|
-    printf("%s %s\n",num["forename"],num["surname"])
-  }
+#  document_detail["authors"].each{|num|
+#    printf("%s %s\n",num["forename"],num["surname"])
+#  }
 
 
 #  document_detail = JSON.parse(access_token.get('http://api.mendeley.com/oapi/library/documents/'+"#{ids}"+'/').body)
@@ -125,36 +128,6 @@ group_documents_ids.each{|ids|
 #        authors_name[group_documents_ids_count_num[authors_count_num]] =document_detail_val
 #        authors_count_num+=1
 #      end
-
-
-
-
-
-# for i in 0..authors_count_num do
-#   authors_name[group_documents_ids_count_num[i]]
-
-#    authors_name[group_documents_ids_count_num].each{|name|
-#      name.each{|name_type,name_body|
-#        if type == "forname" then
-#          family_name[name_count_num] = body
-#          puts family_name[name_count_num]
-#        elsif type == "sunname" then
-#          given_name[name_count_num] = body
-#          puts gimen_name[name_count_num]
-#       end
-#        if type == "forname" or type == "sunname" then
-#          name_count_num +=1
-#        end
-#      }
-#      }    
-#   end
-
-
-
-
-
-
-
 
 
 
@@ -168,35 +141,33 @@ group_documents_ids.each{|ids|
 #      printf "#{document_title_count_num}件目\n"
 #      puts "#{document_detail_key}:#{document_detail_val}"
 #    end
-#  }
 
-
-#document_detail.each{|key,val|
-#  if key != "title" then  
-#    puts "#{key}:#{val}"
-#  end
-#  if key == "files" then
-#    val.each{|hash|
-#      hash.each{|files_key,files_val|
-#        if files_key == "file_hash" then
-#          file_hash[count_hash_num] = files_val
-#          count_hash_num+=1
-#       end
-#      }
-#
-#    }
-#  end
-#  }
-#group_documents_ids_count_num+=1
-}
-#puts authors_name[0][1]
-printf "\n\n"
-
-printf "==================================================\n\n"
 document_detail.each{|key,val|
-  puts "#{key}:#{val}"
+  if key != "title" then  
+#    puts "#{key}:#{val}"
+  end
+  if key == "files" then
+    val.each{|hash|
+      hash.each{|files_key,files_val|
+        if files_key == "file_hash" then
+          file_hash[count_hash_num] = files_val
+          count_hash_num+=1
+       end
+     }
+    }
+  end
+  }
 }
-printf "==================================================\n\n"
+#group_documents_ids_count_num+=1
+
+#puts authors_name[0][1]
+#printf "\n\n"
+
+#printf "==================================================\n\n"
+document_detail.each{|key,val|
+ # puts "#{key}:#{val}"
+}
+#printf "==================================================\n\n"
 
 #========================================
 
@@ -204,18 +175,18 @@ printf "==================================================\n\n"
 
 
 #====== ドキュメントDL ============
-#count_hash_num=0
+count_hash_num=0
 #printf "ドキュメントDL\n"
-#group_documents_ids.each{|id|
-#body = access_token.get('http://api.mendeley.com/oapi/library/documents/'+id+'/file/'+"#{file_hash[count_hash_num]}"+'/'+"#{groups_id}"+'/').body
+group_documents_ids.each{|id|
+body = access_token.get('http://api.mendeley.com/oapi/library/documents/'+id+'/file/'+"#{file_hash[count_hash_num]}"+'/'+"#{groups_id}"+'/').body
 #この時点ではバイナリデータでDLしている
+#p file_hash[count_hash_num]
 
-#open(id+".pdf","wb"){|file|
-#file.write body
-
-#              }
-#count_hash_num+=1
-#}
+open(id+".pdf","wb"){|file|
+file.write body
+              }
+count_hash_num+=1
+}
 
 #printf "書き込み終了\n"
 
@@ -249,21 +220,152 @@ printf "==================================================\n\n"
 #=================================
 
 
+
+
+
+
 #===== 書誌データ作成(xml) ======
 #使えそうなデータ
 #タイトル、著者(苗字、名前、フルネーム)、出版年
 
 
 #printf "書誌データ作成\n"
+
 #document_title
+bibliographic_data=nil
+first_half_tag=nil
+last_half_tag=nil
+open_person_tag="<person:person>\n"
+close_person_tag="</person:person>\n"
+full_name_tag=""
+family_name_tag=""
+given_name_tag=""
+other_tag='<dcterms:issued xsi:type="dcterms:W3CDTF">2013-08-09</dcterms:issued>'+"\n"+'<source:source type="http://purl.org/eprint/type/Book">'+"\n"
+title_tag=""
+folder=""
+input_files=nil
+zip_filename=""
+organization_tag="<organization:organization>"+"\n"+"<dc:title>NIMS</dc:title>"+"\n"+"<eterms:address/>"+"\n"+"<dc:identifier>escidoc:1001</dc:identifier>"+"\n"+"</organization:organization>"+"\n"
+close_eterms_creator_tag="</eterms:creator>"+"\n"
+
+temp_count=0
+
+File.open("first_half.txt"){|first|
+  first_half_tag=first.read
+}
+
+File.open("last_half.txt"){|last|
+  last_half_tag=last.read
+}
+
+group_documents_ids.each{|ids|
+  File.open(ids+".xml","w"){|file|
+    file.write first_half_tag
+    document_detail = JSON.parse(access_token.get('http://api.mendeley.com/oapi/library/documents/'+"#{ids}"+'/').body)
+    temp_count=0
+    document_detail["authors"].each{|num|
 
 
-#bibliographic_data=nil
-#
-#open(id+".xml","w"){|file|
-#file.write bibliographic data
-#              }
-#}
+
+
+
+      if temp_count==0 then
+
+
+
+
+      file.write open_person_tag
+     # if num["forename"]!=nil and num["surname"]!=nil then
+     #   full_name_tag="<eterms:complete-name>"+num["forename"]+"."+num["surname"]+"</eterms:complete-name>\n"
+     #   file.write full_name_tag
+     # end
+      if num["forename"]!=nil then
+        family_name_tag="<eterms:family-name>"+num["forename"]+"</eterms:family-name>\n"
+        file.write family_name_tag
+      end
+ #      printf("%s %s\n",num["forename"],num["surname"])
+      if num["surname"]!=nil then
+      given_name_tag="<eterms:given-name>"+num["surname"]+"</eterms:given-name>\n"
+      file.write given_name_tag
+      temp_count=1
+      end
+      file.write organization_tag
+      file.write close_person_tag
+
+
+
+
+
+end
+
+
+
+
+
+
+
+
+    }
+    
+ #   file.write mid_tag
+    title_tag="<dc:title>"+document_detail["title"]+"</dc:title>\n"
+    file.write close_eterms_creator_tag
+    file.write title_tag
+    file.write other_tag
+    file.write title_tag
+    file.write last_half_tag
+    file.close
+
+#===以下Zip化作業==
+  folder="/home/a012427/public_html/mendeley"
+  input_filenames=["#{ids}.xml"]
+    zipfile_name="/home/a012427/public_html/mendeley/#{ids}.zip"
+  Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
+    input_filenames.each do |filename|
+      # Two arguments:
+      # - The name of the file as it will appear in the archive
+      # - The original file, including the path to find it
+        zipfile.add(filename, folder + '/' + filename) { true }
+    end
+  end
+
+
+
+#===================
+  }
+}
+
+
+
+
 #=================
 
-printf "おわり\n"
+
+
+#=================
+printf "Pubman新規作成\n"
+
+#basic認証用
+access_id="pubman_depositor"
+access_pass="admin"
+
+Net::HTTP.version_1_2
+
+group_documents_ids.each{|ids|
+  File.open(ids+".zip","r"){|file|
+    req=Net::HTTP::Post.new("http://amaayo.nims.go.jp:8080/pubman/faces/sword-app/deposit?collection=escidoc:3001")
+    req.basic_auth "#{access_id}","#{access_pass}"
+    Net::HTTP.start('amaayo.nims.go.jp'){|http|
+      req.set_form_data({"type" => "application/zip","X-Packaging" => "http://purl.org/escidoc/metadata/schemas/0.1/publication","X-Verbose" => true})
+      req.body=file.read
+      response=http.request(req)
+      puts response.body
+      }
+  }
+}
+
+
+
+
+#==============
+#printf "おわり\n"
