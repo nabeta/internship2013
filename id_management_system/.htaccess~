@@ -1,0 +1,8 @@
+Options ExecCGI Indexes
+
+AuthUserFile /home/a012427/public_html/id_managment_ysytem/.htpasswd
+AuthGroupFile /dev/null
+AuthName "Please enter username and password"
+AuthType Basic
+
+require valid-user

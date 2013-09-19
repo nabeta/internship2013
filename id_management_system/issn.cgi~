@@ -66,7 +66,7 @@ if search_word=="" then
 
 db.execute("select resource.id,resource.title,identifier.id_type,identifier.body from resource left join identifier on resource.id=identifier.resource_id "){|row|
 printf("<tr><td>%d</td><td>",row[0])
-printf('<a href='"http://komorido.nims.go.jp/~a012427/detail.cgi?id=%d"'>%s</a>',row[0],CGI.escapeHTML(row[1]))
+printf('<a href='"./detail.cgi?id=%d"'>%s</a>',row[0],CGI.escapeHTML(row[1]))
 printf("</td><td>%s",CGI.escapeHTML(row[2]))
 
 # Tempfile.open([file_name,'.csv']){|file|
@@ -112,7 +112,7 @@ print("\n")
 s_id.each{|each_id|
 db.execute("select resource.id,resource.title,identifier.id_type,identifier.body from resource left join identifier on resource.id=identifier.resource_id where resource.id=?;",each_id){|row|
 printf("<tr><td>%d</td><td>",row[0])
-printf('<a href='"http://komorido.nims.go.jp/~a012427/detail.cgi?id=%d"'>%s</a>',row[0],CGI.escapeHTML(row[1]))
+printf('<a href='"./detail.cgi?id=%d"'>%s</a>',row[0],CGI.escapeHTML(row[1]))
 printf("</td><td>%s",CGI.escapeHTML(row[2]))
 
 # Tempfile.open([file_name,'.csv']){|file|
@@ -148,12 +148,12 @@ db.close
 end
 }
 
-print('<a href='"http://komorido.nims.go.jp/~a012427/new.cgi"'>新規作成</a>'"\n")
+print('<a href='"./new.cgi"'>新規作成</a>'"\n")
 
 #p '/home/a012427/public_html/'+pass
 FileUtils.cp pass,'/home/a012427/public_html'+pass
 FileUtils.chmod(0644,'/home/a012427/public_html'+pass)
-printf('<a href='"http://komorido.nims.go.jp/~a012427/%s"'>ファイル出力</a>'"\n",pass.to_s)
+printf('<a href='"./%s"'>ファイル出力</a>'"\n",pass.to_s)
 
 
 
