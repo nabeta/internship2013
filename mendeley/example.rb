@@ -45,6 +45,26 @@ printf "ログイン完了\n"
 # ===========================
 
 
+#====== フォルダ情報取得  =========================
+printf "フォルダID取得\n"
+folder_id=""
+folders=JSON.parse(access_token.get('http://api.mendeley.com/oapi/library/folders/').body)
+folders.each{|folder|
+  if folder["name"]=="PubMan" then
+    folder_id=folder["id"].to_s
+    puts folder_id
+  end
+}
+
+
+
+
+#====== フォルダ内ドキュメント情報取得 ==============
+printf "フォルダ内ドキュメントID取得\n"
+documents_ids=JSON.parse(access_token.get("http://api.mendeley.com/oapi/library/folders/#{folder_id}/").body)
+documents_ids["document_ids"].each{|ids|
+  p ids
+}
 
 
 #==== Profile Infomation ====
@@ -61,38 +81,38 @@ printf "ログイン完了\n"
 
 #==== User Library Groups ====
 #printf "\nグループ情報\n"
-groups_id=nil
+#groups_id=nil
 
-temp_groups =access_token.get('http://api.mendeley.com/oapi/library/groups/').body
-groups=JSON.parse(temp_groups)
-groups.each{|groups_hash|
-  groups_hash.each{|groups_key,groups_val|
+#temp_groups =access_token.get('http://api.mendeley.com/oapi/library/groups/').body
+#groups=JSON.parse(temp_groups)
+#groups.each{|groups_hash|
+ # groups_hash.each{|groups_key,groups_val|
 #    puts "#{groups_key}:#{groups_val}"
-    if groups_key=="id" then
-      groups_id =groups_val
-    end
-  }
-}
+  #  if groups_key=="id" then
+   #   groups_id =groups_val
+   # end
+ # }
+#}
 #=============================
 
 #sleep 3
 
 
 #===== Group Documents ======
-printf "\nグループライブラリー情報\n"
-group_documents_ids = nil
+#printf "\nグループライブラリー情報\n"
+#group_documents_ids = nil
 
-temp_group_documents =  access_token.get('http://api.mendeley.com/oapi/library/groups/'+"#{groups_id}"+'/').body
-group_documents = JSON.parse(temp_group_documents)
+#temp_group_documents =  access_token.get('http://api.mendeley.com/oapi/library/groups/'+"#{groups_id}"+'/').body
+#group_documents = JSON.parse(temp_group_documents)
 
-group_documents.each{|group_documents_key,group_documents_val|
-  puts "#{group_documents_key}:#{group_documents_val}"
-  if group_documents_key=="document_ids" then
-    group_documents_val.each{|ids|
-      group_documents_ids=group_documents_val
-    }
-  end
-}
+#group_documents.each{|group_documents_key,group_documents_val|
+ # puts "#{group_documents_key}:#{group_documents_val}"
+  #if group_documents_key=="document_ids" then
+   # group_documents_val.each{|ids|
+    #  group_documents_ids=group_documents_val
+    #}
+  #end
+#}
 #===========================
 
 #sleep 3
@@ -115,8 +135,7 @@ document_title={}
 #authors_count_num=0
 
 
-
-group_documents_ids.each{|ids|
+documents_ids["document_ids"].each{|ids|
 #
   document_detail = JSON.parse(access_token.get('http://api.mendeley.com/oapi/library/documents/'+"#{ids}"+'/').body)
 #  document_detail["authors"].each{|num|
@@ -180,8 +199,8 @@ document_detail.each{|key,val|
 #====== ドキュメントDL ============
 count_hash_num=0
 printf "ドキュメントDL\n"
-group_documents_ids.each{|id|
-  body = access_token.get('http://api.mendeley.com/oapi/library/documents/'+id+'/file/'+"#{file_hash[count_hash_num]}"+'/'+"#{groups_id}"+'/').body
+documents_ids["document_ids"].each{|id|
+  body = access_token.get('http://api.mendeley.com/oapi/library/documents/'+id+'/file/'+"#{file_hash[count_hash_num]}"+'/').body
   #この時点ではバイナリデータでDLしている
  printf "ハッシュ値:%s\n",file_hash[count_hash_num].to_s
   if file_hash[count_hash_num]!=nil then
@@ -268,7 +287,7 @@ File.open("last_half.txt"){|last|
   last_half_tag=last.read
 }
 
-group_documents_ids.each{|ids|
+documents_ids["document_ids"].each{|ids|
   File.open(ids+".xml","w"){|file|
 
   #  p document_title[ids.to_s]
@@ -387,7 +406,7 @@ request_uri="http://amaayo.nims.go.jp:8080/pubman/faces/sword-app/deposit?collec
 uri=URI.parse "http://amaayo.nims.go.jp:8080/pubman/faces/sword-app/deposit?collection=escidoc:3001"
 Net::HTTP.version_1_2
 
-group_documents_ids.each{|ids|
+documents_ids["document_ids"].each{|ids|
   if File.exist?("#{ids}.zip") then
     printf "%s.zip登録中\n",ids.to_s
     File.open(ids+".zip","r"){|file|
