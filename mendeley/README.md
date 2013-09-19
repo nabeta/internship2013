@@ -1,5 +1,3 @@
-Welcome to the internship wiki!
-
 #セルフアーカイブへの登録システム利用法 README
 ##始めに
 このシステムは文献管理ツールMendeleyに登録されているグループライブラリー情報を、セルフアーカイブシステムPubManに自動的に登録することを目的として製作されています。利用するにはMendeleyAccount,MendeleyAPI,PubManAccountが必要です。  
