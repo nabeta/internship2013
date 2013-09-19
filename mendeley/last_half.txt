@@ -1,0 +1,10 @@
+<eterms:volume/>
+<eterms:issue/>
+<eterms:start-page/>
+<eterms:end-page/>
+</source:source>
+<dcterms:subject></dcterms:subject>
+<dcterms:tableOfContents></dcterms:tableOfContents>
+</publication:publication>
+</escidocMetadataRecords:md-record>
+</escidocMetadataRecords:md-records>
