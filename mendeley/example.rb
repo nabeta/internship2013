@@ -33,7 +33,8 @@ access_token = OAuth::AccessToken.new(
 
 
 #====== ここらへんまでログイン作業 =======
-printf "ログインできているか確認用"
+printf "ログイン完了\n"
+
 
 
 
@@ -78,7 +79,7 @@ groups.each{|groups_hash|
 
 
 #===== Group Documents ======
-#printf "\nグループライブラリー情報\n"
+printf "\nグループライブラリー情報\n"
 group_documents_ids = nil
 
 temp_group_documents =  access_token.get('http://api.mendeley.com/oapi/library/groups/'+"#{groups_id}"+'/').body
@@ -98,7 +99,7 @@ group_documents.each{|group_documents_key,group_documents_val|
 
 
 #====== 各グループドキュメント詳細情報 =====
-#printf "\nグループドキュメント詳細情報\n"
+printf "\nグループドキュメント詳細情報\n"
 document_detail=nil
 document_title_count_num=0
 #group_documents_ids_count_num=0
@@ -164,11 +165,12 @@ document_detail.each{|key,val|
 #puts authors_name[0][1]
 #printf "\n\n"
 
-printf "==================================================\n\n"
-document_detail.each{|key,val|
-  puts "#{key}:#{val}"
-}
-printf "==================================================\n\n"
+  printf "==================================================\n"
+  printf "タイトル情報：%s\n",document_title[ids.to_s].to_s
+  document_detail.each{|key,val|
+    puts "#{key}:#{val}"
+  }
+  printf "==================================================\n\n"
 }
 #========================================
 
@@ -181,7 +183,7 @@ printf "ドキュメントDL\n"
 group_documents_ids.each{|id|
   body = access_token.get('http://api.mendeley.com/oapi/library/documents/'+id+'/file/'+"#{file_hash[count_hash_num]}"+'/'+"#{groups_id}"+'/').body
   #この時点ではバイナリデータでDLしている
-  p file_hash[count_hash_num]
+ printf "ハッシュ値:%s\n",file_hash[count_hash_num].to_s
   if file_hash[count_hash_num]!=nil then
     open(id+".pdf","wb"){|file|
       file.write body
@@ -191,7 +193,7 @@ group_documents_ids.each{|id|
 }
 #
 
-printf "書き込み終了\n"
+printf "書き込み終了\n\n"
 
 #============
 
@@ -199,6 +201,7 @@ printf "書き込み終了\n"
 
 
 #===== POSTメゾット ========
+#インターン1週目で作ったシステムにPOST
 #Net::HTTP.version_1_2
 #count_title_num=0
 
@@ -238,8 +241,8 @@ printf "書誌データ作成\n"
 bibliographic_data=nil
 first_half_tag=nil
 last_half_tag=nil
-open_person_tag="<person:person>\n"
-close_person_tag="</person:person>\n"
+open_person_tag='<eterms:creator role="http://www.loc.gov/loc.terms/relators/AUT">'+"\n"+"<person:person>"+"\n"
+close_person_tag="</person:person>"+"\n"+"</eterms:creator>"+"\n"
 full_name_tag=""
 family_name_tag=""
 given_name_tag=""
@@ -249,13 +252,13 @@ folder=""
 input_files=nil
 zip_filename=""
 organization_tag="<organization:organization>"+"\n"+"<dc:title>NIMS</dc:title>"+"\n"+"<eterms:address/>"+"\n"+"<dc:identifier>escidoc:1001</dc:identifier>"+"\n"+"</organization:organization>"+"\n"
-close_eterms_creator_tag="</eterms:creator>"+"\n"
+#close_eterms_creator_tag="</eterms:creator>"+"\n"
 link_tag=""
 link_url=""
 attach_tag=""
+temp_name={}
 
-
-temp_count=0
+#temp_count=0
 
 File.open("first_half.txt"){|first|
   first_half_tag=first.read
@@ -268,7 +271,7 @@ File.open("last_half.txt"){|last|
 group_documents_ids.each{|ids|
   File.open(ids+".xml","w"){|file|
 
-    p document_title[ids.to_s]
+  #  p document_title[ids.to_s]
     
     link_url=URI.encode("http://www.mendeley.com/catalog/#{document_title[ids.to_s]}")
     
@@ -282,14 +285,14 @@ group_documents_ids.each{|ids|
 
     file.write first_half_tag
     document_detail = JSON.parse(access_token.get('http://api.mendeley.com/oapi/library/documents/'+"#{ids}"+'/').body)
-    temp_count=0
+#    temp_count=0
     document_detail["authors"].each{|num|
 
 
 
 
 
-      if temp_count==0 then
+ #     if temp_count==0 then
 
 
 
@@ -307,7 +310,7 @@ group_documents_ids.each{|ids|
       if num["surname"]!=nil then
       given_name_tag="<eterms:given-name>"+num["surname"]+"</eterms:given-name>\n"
       file.write given_name_tag
-      temp_count=1
+#     temp_count=1
       end
       file.write organization_tag
       file.write close_person_tag
@@ -315,7 +318,7 @@ group_documents_ids.each{|ids|
 
 
 
-end
+#end
 
 
 
@@ -328,7 +331,7 @@ end
     
  #   file.write mid_tag
     title_tag="<dc:title>"+document_detail["title"]+"</dc:title>\n"
-    file.write close_eterms_creator_tag
+ #   file.write close_eterms_creator_tag
     file.write title_tag
     file.write other_tag
     file.write title_tag
@@ -338,24 +341,27 @@ end
     file.close
 
 #===以下Zip化作業==
-  folder="/home/a012427/public_html/mendeley"
-    if File.exist?("#{ids}.pdf") then
-      input_filenames=["#{ids}.xml","#{ids}.pdf"]
-    else
-      input_filenames=["#{ids}.xml"]
+    folder="/home/a012427/public_html/mendeley" 
+    if document_detail["authors"][0]!=nil then 
+      temp_name = document_detail["authors"][0]
+      if temp_name["surname"]!="" and temp_name["forename"]!="" then 
+          if File.exist?("#{ids}.pdf") then
+            input_filenames=["#{ids}.xml","#{ids}.pdf"]
+          else
+            input_filenames=["#{ids}.xml"]
+          end
+          zipfile_name="/home/a012427/public_html/mendeley/#{ids}.zip"
+          Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
+            input_filenames.each do |filename|
+              # Two arguments:
+              # - The name of the file as it will appear in the archive
+              # - The original file, including the path to find it
+              zipfile.add(filename, folder + '/' + filename) { true }
+          end
+        end
+        File.chmod(0644,"#{ids}.zip")
+      end
     end
-    zipfile_name="/home/a012427/public_html/mendeley/#{ids}.zip"
-  Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
-    input_filenames.each do |filename|
-      # Two arguments:
-      # - The name of the file as it will appear in the archive
-      # - The original file, including the path to find it
-        zipfile.add(filename, folder + '/' + filename) { true }
-    end
-  end
-
-
-
 #===================
   }
 }
@@ -368,25 +374,30 @@ end
 
 
 #=================
-printf "Pubman新規作成\n"
+printf "\nPubman新規作成\n"
+
+pubman_config= YAML.load(open('pubman.yml'))
 
 #basic認証用
-access_id=""#id
-access_pass=""#pass
+access_id=pubman_config['pubman_id']#id
+access_pass=pubman_config['pubman_pass']#pass
 request_uri="http://amaayo.nims.go.jp:8080/pubman/faces/sword-app/deposit?collection=escidoc:3001"
 uri=URI.parse "http://amaayo.nims.go.jp:8080/pubman/faces/sword-app/deposit?collection=escidoc:3001"
 Net::HTTP.version_1_2
 
 group_documents_ids.each{|ids|
-  File.open(ids+".zip","r"){|file|
-    request = Net::HTTP::Post.new(uri.request_uri, initheader = {"Content-Type" => "application/zip","X-Packaging" => "http://purl.org/escidoc/metadata/schemas/0.1/publication","X-Verbose" => "true"})
-    request.body = file.read
-    request.basic_auth access_id, access_pass
-    Net::HTTP.start('amaayo.nims.go.jp'){|http|
-      response=http.request(request) #実際にデータを送信している
-      puts response.body
+  if File.exist?("#{ids}.zip") then
+    printf "%s.zip登録中\n",ids.to_s
+    File.open(ids+".zip","r"){|file|
+      request = Net::HTTP::Post.new(uri.request_uri, initheader = {"Content-Type" => "application/zip","X-Packaging" => "http://purl.org/escidoc/metadata/schemas/0.1/publication","X-Verbose" => "true"})
+      request.body = file.read
+      request.basic_auth access_id, access_pass
+      Net::HTTP.start('amaayo.nims.go.jp'){|http|
+        response=http.request(request) #実際にデータを送信している
+        puts response.body
+      }
     }
-  }
+  end
 }
 
 
