@@ -191,7 +191,7 @@ group_documents_ids.each{|id|
   end
   count_hash_num+=1
 }
-#
+
 
 printf "書き込み終了\n\n"
 
@@ -339,9 +339,10 @@ group_documents_ids.each{|ids|
     file.write link_tag
     file.write attach_tag
     file.close
+    printf "%s.xml作成完了\n",ids.to_s
 
 #===以下Zip化作業==
-    folder="/home/a012427/public_html/mendeley" 
+    folder=File.dirname(File.expand_path(__FILE__)) #"/home/a012427/public_html/mendeley" 
     if document_detail["authors"][0]!=nil then 
       temp_name = document_detail["authors"][0]
       if temp_name["surname"]!="" and temp_name["forename"]!="" then 
@@ -350,8 +351,8 @@ group_documents_ids.each{|ids|
           else
             input_filenames=["#{ids}.xml"]
           end
-          zipfile_name="/home/a012427/public_html/mendeley/#{ids}.zip"
-          Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
+        zipfile_name=folder+"/#{ids}.zip"
+         Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
             input_filenames.each do |filename|
               # Two arguments:
               # - The name of the file as it will appear in the archive
@@ -360,6 +361,7 @@ group_documents_ids.each{|ids|
           end
         end
         File.chmod(0644,"#{ids}.zip")
+        printf "%s.zip作成完了\n",ids.to_s
       end
     end
 #===================
