@@ -8,6 +8,7 @@ require 'tempfile'
 require 'net/http'
 require 'yaml'
 require 'zip'
+require 'sqlite3'
 
 #====== ここでログイン作業中 ======
 
@@ -193,6 +194,32 @@ document_detail.each{|key,val|
 }
 #========================================
 
+
+
+#========= DB参照 ==============
+printf "DB内参照中\n"
+registered_id=nil
+new_id=nil
+document_detail=nil
+new_flag=0
+documents_ids["document_ids"].each{|id|
+  db=SQLite3::Database.new("mendeley.db")
+  db.execute("select * from mendeley where mendeley_id=?;",id){|ids|
+    registered_id=ids[1]
+  }
+  if registered_id!=id then
+    document_detail = JSON.parse(access_token.get('http://api.mendeley.com/oapi/library/documents/'+"#{id}"+'/').body)
+    db.execute("insert into mendeley values(NULL,?,?);",id.to_s,document_detail["title"].to_s)
+    new_id={id => id}
+    p new_id
+    new_flag=1
+  end
+  db.close
+}
+#p new_id.nil?
+if new_flag==1 then #最後の行まで括る
+
+#=====================================
 
 
 
@@ -406,7 +433,8 @@ request_uri="http://amaayo.nims.go.jp:8080/pubman/faces/sword-app/deposit?collec
 uri=URI.parse "http://amaayo.nims.go.jp:8080/pubman/faces/sword-app/deposit?collection=escidoc:3001"
 Net::HTTP.version_1_2
 
-documents_ids["document_ids"].each{|ids|
+#documents_ids["document_ids"].each{|ids|
+new_id.each{|key,ids|
   if File.exist?("#{ids}.zip") then
     printf "%s.zip登録中\n",ids.to_s
     File.open(ids+".zip","r"){|file|
@@ -423,4 +451,5 @@ documents_ids["document_ids"].each{|ids|
 
 
 #==============
+end
 printf "おわり\n"

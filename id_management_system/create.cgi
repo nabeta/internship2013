@@ -87,7 +87,7 @@ end
   }
   db.close
   print("Content-Type: text/html; charset=utf-8\n")
-    printf("Location: http://komorido.nims.go.jp/~a012427/id_managment_system/detail.cgi?id=%d\n",create_id)
+    printf("Location: http://komorido.nims.go.jp/~a012427/id_management_system/detail.cgi?id=%d\n",create_id)
   print("\n")
   else
 
@@ -99,7 +99,7 @@ print(" \"http://www.w3.org/TR/html4/strict.dtd\">\n")
 
 print("<html>\n")
 print("<head>\n")
-print('<meta http-equiv="refresh" content="5; URL=http://komorido.nims.go.jp/~a012427/id_managment_system/new.cgi">')
+print('<meta http-equiv="refresh" content="5; URL=http://komorido.nims.go.jp/~a012427/id_management_system/new.cgi">')
 
 print("\n")
 print("<title>更新ページ</title>\n")

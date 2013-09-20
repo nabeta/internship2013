@@ -151,8 +151,8 @@ end
 print('<a href='"./new.cgi"'>新規作成</a>'"\n")
 
 #p '/home/a012427/public_html/'+pass
-FileUtils.cp pass,'./public_html'+pass
-FileUtils.chmod(0644,'./public_html'+pass)
+FileUtils.cp pass,'./'+pass
+FileUtils.chmod(0644,'./'+pass)
 printf('<a href='"./%s"'>ファイル出力</a>'"\n",pass.to_s)
 
 

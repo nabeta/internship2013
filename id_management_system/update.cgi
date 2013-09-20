@@ -110,7 +110,7 @@ end
 
   db.close
   print("Content-Type: text/html; charset=utf-8\n")
-  print  "Location: http://komorido.nims.go.jp/~a012427/id_managment_system/detail.cgi?id=#{update_id}\n"
+  print  "Location: http://komorido.nims.go.jp/~a012427/id_management_system/detail.cgi?id=#{update_id}\n"
   print("\n")
 else
 
@@ -122,7 +122,7 @@ print(" \"http://www.w3.org/TR/html4/strict.dtd\">\n")
 
 print("<html>\n")
 print("<head>\n")
-printf('<meta http-equiv="refresh" content="5; URL=http://komorido.nims.go.jp/~a012427/id_managment_system/edit.cgi?id=%s">',update_id.to_s)
+printf('<meta http-equiv="refresh" content="5; URL=http://komorido.nims.go.jp/~a012427/id_management_system/edit.cgi?id=%s">',update_id.to_s)
 
 print("\n")
 print("<title>更新ページ</title>\n")
