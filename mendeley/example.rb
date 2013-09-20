@@ -199,7 +199,7 @@ document_detail.each{|key,val|
 #========= DB参照 ==============
 printf "DB内参照中\n"
 registered_id=nil
-new_id=nil
+new_id={}
 document_detail=nil
 new_flag=0
 documents_ids["document_ids"].each{|id|
@@ -210,7 +210,7 @@ documents_ids["document_ids"].each{|id|
   if registered_id!=id then
     document_detail = JSON.parse(access_token.get('http://api.mendeley.com/oapi/library/documents/'+"#{id}"+'/').body)
     db.execute("insert into mendeley values(NULL,?,?);",id.to_s,document_detail["title"].to_s)
-    new_id={id => id}
+    new_id.store id , id
     p new_id
     new_flag=1
   end

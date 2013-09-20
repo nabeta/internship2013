@@ -1,6 +1,6 @@
 #セルフアーカイブへの登録システム利用法 README
 ##始めに
-このシステムは文献管理ツールMendeleyに登録されているグループライブラリー情報を、セルフアーカイブシステムPubManに自動的に登録することを目的として製作されています。利用するにはMendeleyAccount,MendeleyAPI,PubManAccountが必要です。  
+このシステムは文献管理ツールMendeleyに登録されているグループライブラリー情報を、セルフアーカイブシステムPubManに自動的に登録することを目的として製作しています。利用するにはMendeleyAccount,MendeleyAPI,PubManAccountが必要です。  
 持っていない場合、以下のリンクから各サイトに移動してアカウントもしくはAPIキーを取得してください。  
   
 Mendeley：<http://www.mendeley.com/>  
@@ -45,3 +45,9 @@ pubman_pass:(スペース)PubMan Passwordを入力
 **ドキュメントが存在しない場合には書誌情報のみが登録されます。**  
 **ドキュメントに著者が存在しない、もしくは姓、名に入力漏れがある場合はPubManに情報は登録されません。**  
   
+###著作情報
+著者:久保田 豊久  
+連絡先:sagittariusu@hotmail.co.jp  
+作成日:2013/09/20  
+  
+This work is licensed under the Creative Commons Attribution 3.0 Unported License. To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/.
